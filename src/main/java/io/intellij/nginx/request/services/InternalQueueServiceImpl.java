@@ -45,6 +45,12 @@ public class InternalQueueServiceImpl implements InternalQueueService, Initializ
     public void consume(NginxRequestLog requestLog) {
         try {
             log.info("consume|{}", requestLog);
+            String ipv4 = requestLog.getRemoteAddr();
+            // 忽略内网IP
+            if (ipv4.startsWith("10.") || ipv4.startsWith("192.168.") || ipv4.startsWith("172.")) {
+                log.warn("ignore internal ip|{}", ipv4);
+                return;
+            }
             nginxRequestLogService.save(requestLog);
         } catch (Exception e) {
             log.error("save occurred error|{}", e.getMessage());
